@@ -7,24 +7,19 @@ var countries = (function () {
         'dataType': "json",
         'success': function (data) {
             json = data;
-            console.log(data);
         }
     });
 
     dictionary = {}
 	json.forEach(function(x) {
-	    dictionary[x['alpha-2']] = x.name
+	    dictionary[x['alpha-2'].toLowerCase()] = x.name
 	})
     return dictionary;
 })();
 
-console.log(countries);
 
-
- var svgElement = document.getElementById("world");
- var svgDocument;
- var australia;
- var colour = "#00000";
+var svgElement = document.getElementById("world");
+var svgDocument;
 
 
 var randomColour = function () {
@@ -43,9 +38,27 @@ var colourCountry = function (code, colour) {
 	}
 };
 
+var setCountryLabel = function (code) {
+	var label = document.getElementById("country");
+	label.innerHTML = countries[code];
+};
+
 var changeColour = function () {
 	colourCountry(randomKey(countries), randomColour());
 };
+
+var fade = function (code) {
+    var op = 1;  // initial opacity
+    var timer = setInterval(function () {
+        if (op <= 0.1){
+            clearInterval(timer);
+            element.style.display = 'none';
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op -= op * 0.1;
+    }, 50);
+}
 
 
 svgElement.addEventListener("load", function() {
@@ -53,12 +66,12 @@ svgElement.addEventListener("load", function() {
 
 	//window.setInterval(changeColour, 1);
 	for(var key in countries) {
-		console.log('test' + key);
 		var code = key.toLowerCase();
 		var country = svgDocument.getElementById(code);
 		var on = (function(code) { 
 			return function() {
 				colourCountry(code, 'red');
+				setCountryLabel(code);
 		};})(code);
 
 		var off = (function(code) { 
@@ -77,11 +90,6 @@ svgElement.addEventListener("load", function() {
 		colourCountry(code, 'gray');
 	}
 
- }, false);
-
-
-for (var key in countries){
-	console.log(key)
-}
+}, false);
 
 
