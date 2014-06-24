@@ -31,16 +31,23 @@ var randomKey = function (obj) {
     return keys[keys.length * Math.random() << 0];
 };
 
+function toTitleCase(str)
+{
+	return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
 var colourCountry = function (code, colour) {
-	var country = svgDocument.querySelectorAll('.' + code.toLowerCase());
-	for(var i = 0; i < country.length; i++) {
-		country[i].style.fill = colour;	
-	}
+	var selection = svgDocument.getElementById(code);
+	selection.style.fill = colour;	
+	//var country = svgDocument.querySelectorAll('.' + code.toLowerCase());
+	//for(var i = 0; i < country.length; i++) {
+	//	country[i].style.fill = colour;	
+	//}
 };
 
 var setCountryLabel = function (code) {
 	var label = document.getElementById("country");
-	label.innerHTML = countries[code];
+	label.innerHTML = toTitleCase(code);
 };
 
 var changeColour = function () {
@@ -64,30 +71,33 @@ var fade = function (code) {
 svgElement.addEventListener("load", function() {
 	svgDocument = svgElement.contentDocument;
 
-	//window.setInterval(changeColour, 1);
-	for(var key in countries) {
-		var code = key.toLowerCase();
-		var country = svgDocument.getElementById(code);
-		var on = (function(code) { 
-			return function() {
-				colourCountry(code, 'red');
-				setCountryLabel(code);
-		};})(code);
 
-		var off = (function(code) { 
-			return function() {
-				colourCountry(code, 'gray');
-		};})(code);
+	var paths = svgDocument.getElementsByTagName('path');
+	console.log(paths);
+	for(var i = 0; i < paths.length; i++) {
+		var path = paths[i];
+		console.log(path.id);
+		var id = path.id;
+		//var code = key.toLowerCase();
+		//var country = svgDocument.getElementById(code);
 		
-		if(!country) {
-			console.log('Failed to find element for ' + code);
-			continue;
-		}
 
-		country.addEventListener('mouseenter', on);
-		country.addEventListener('mouseleave', off);
+		var on = (function(id) { 
+			return function() {
+				colourCountry(id, '#99CC99');
+				setCountryLabel(id);
+				//svgDocument.getElementById(id).transform.baseVal.getItem(0).setScale(2,2);
+		};})(id);
 
-		colourCountry(code, 'gray');
+		var off = (function(id) { 
+			return function() {
+				colourCountry(id, 'green');
+		};})(id);
+
+		path.addEventListener('mouseenter', on);
+		path.addEventListener('mouseleave', off);
+
+		colourCountry(id, 'green');
 	}
 
 }, false);
